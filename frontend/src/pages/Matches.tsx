@@ -51,37 +51,58 @@ function MatchCard({
       </div>
 
       <div className="flex items-center justify-between text-white text-lg font-semibold">
-        <span>{match.home_team}</span>
+        <div className="flex items-center gap-2 flex-1 min-w-0">
+          {match.home_team_crest && (
+            <img src={match.home_team_crest} alt="" className="w-6 h-6 object-contain shrink-0" />
+          )}
+          <span className="truncate">{match.home_team}</span>
+        </div>
         {match.home_score !== null && match.away_score !== null ? (
-          <span className="text-2xl">
+          <span className="text-2xl px-3 shrink-0">
             {match.home_score} - {match.away_score}
           </span>
         ) : (
-          <span className="text-slate-500 text-sm">vs</span>
+          <span className="text-slate-500 text-sm px-3 shrink-0">vs</span>
         )}
-        <span>{match.away_team}</span>
+        <div className="flex items-center gap-2 flex-1 min-w-0 justify-end">
+          <span className="truncate">{match.away_team}</span>
+          {match.away_team_crest && (
+            <img src={match.away_team_crest} alt="" className="w-6 h-6 object-contain shrink-0" />
+          )}
+        </div>
       </div>
 
       {canPredict ? (
         <div className="space-y-2 pt-2">
           <div className="grid grid-cols-3 gap-2">
-            {(["HOME", "DRAW", "AWAY"] as PredictionChoice[]).map((choice) => (
-              <button
-                key={choice}
-                onClick={() => onPredict(match.id, choice)}
-                className={`py-2 rounded text-sm font-medium ${
-                  prediction?.prediction === choice && !wasExactScore
-                    ? "bg-purple-600 text-white"
-                    : "bg-slate-700 hover:bg-slate-600 text-slate-200"
-                }`}
-              >
-                {choice === "HOME"
-                  ? match.home_team
+            {(["HOME", "DRAW", "AWAY"] as PredictionChoice[]).map((choice) => {
+              const crest =
+                choice === "HOME"
+                  ? match.home_team_crest
                   : choice === "AWAY"
-                    ? match.away_team
-                    : "Draw"}
-              </button>
-            ))}
+                    ? match.away_team_crest
+                    : null;
+              return (
+                <button
+                  key={choice}
+                  onClick={() => onPredict(match.id, choice)}
+                  className={`py-2 rounded text-sm font-medium flex items-center justify-center gap-1.5 ${
+                    prediction?.prediction === choice && !wasExactScore
+                      ? "bg-purple-600 text-white"
+                      : "bg-slate-700 hover:bg-slate-600 text-slate-200"
+                  }`}
+                >
+                  {crest && <img src={crest} alt="" className="w-4 h-4 object-contain" />}
+                  <span className="truncate">
+                    {choice === "HOME"
+                      ? match.home_team
+                      : choice === "AWAY"
+                        ? match.away_team
+                        : "Draw"}
+                  </span>
+                </button>
+              );
+            })}
           </div>
           <div className="flex items-center gap-2 text-sm">
             <span className="text-slate-500">Exact score (bonus +5):</span>

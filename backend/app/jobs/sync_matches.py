@@ -42,6 +42,8 @@ def sync_matches(db: Session) -> dict:
             "gameweek": raw["matchday"],
             "home_team": raw["homeTeam"]["name"],
             "away_team": raw["awayTeam"]["name"],
+            "home_team_crest": raw["homeTeam"].get("crest"),
+            "away_team_crest": raw["awayTeam"].get("crest"),
             "kickoff_time": datetime.fromisoformat(raw["utcDate"].replace("Z", "+00:00")),
             "home_score": score.get("home"),
             "away_score": score.get("away"),

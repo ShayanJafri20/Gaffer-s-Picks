@@ -55,6 +55,8 @@ export interface Match {
   gameweek: number;
   home_team: string;
   away_team: string;
+  home_team_crest: string | null;
+  away_team_crest: string | null;
   kickoff_time: string;
   home_score: number | null;
   away_score: number | null;
