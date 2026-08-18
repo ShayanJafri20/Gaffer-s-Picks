@@ -8,6 +8,7 @@ class Settings(BaseSettings):
     jwt_secret: str
     football_api_key: str = ""
     frontend_url: str = "http://localhost:5173"
+    cron_secret: str = ""
 
 
 settings = Settings()

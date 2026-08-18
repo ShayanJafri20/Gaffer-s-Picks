@@ -1,18 +1,26 @@
+import os
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import admin, auth, contributions, leaderboard, matches, predictions, standings
+from app.api import admin, auth, contributions, cron, leaderboard, matches, predictions, standings
 from app.core.config import settings
 from app.jobs.scheduler import start_scheduler, stop_scheduler
+
+# Vercel (and most serverless hosts) sets this automatically. There's no
+# persistent process for an in-thread scheduler to live in there, so the
+# 5-minute sync instead runs via an external cron hitting /cron/sync.
+IS_SERVERLESS = bool(os.environ.get("VERCEL"))
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    start_scheduler()
+    if not IS_SERVERLESS:
+        start_scheduler()
     yield
-    stop_scheduler()
+    if not IS_SERVERLESS:
+        stop_scheduler()
 
 
 app = FastAPI(title="Gaffer's Picks API", lifespan=lifespan)
@@ -32,6 +40,7 @@ app.include_router(leaderboard.router)
 app.include_router(contributions.router)
 app.include_router(standings.router)
 app.include_router(admin.router)
+app.include_router(cron.router)
 
 
 @app.get("/health")
