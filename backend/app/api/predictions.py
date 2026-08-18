@@ -9,6 +9,7 @@ from app.models.match import Match
 from app.models.prediction import Prediction
 from app.models.user import User
 from app.schemas.prediction import PredictionCreate, PredictionOut
+from app.services.gameweek import get_current_gameweek
 
 router = APIRouter(tags=["predictions"])
 
@@ -28,6 +29,12 @@ def submit_prediction(
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Predictions are locked once the match has kicked off",
+        )
+
+    if match.gameweek != get_current_gameweek(db):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Predictions are only open for the current gameweek",
         )
 
     existing = (

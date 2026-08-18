@@ -19,14 +19,17 @@ function MatchCard({
   prediction,
   onPredict,
   onPredictExact,
+  isCurrentGameweek,
 }: {
   match: Match;
   prediction: Prediction | undefined;
   onPredict: (matchId: number, choice: PredictionChoice) => void;
   onPredictExact: (matchId: number, home: number, away: number) => void;
+  isCurrentGameweek: boolean;
 }) {
   const kickedOff = new Date(match.kickoff_time).getTime() <= Date.now();
   const isFinished = match.status === "FINISHED";
+  const canPredict = !kickedOff && isCurrentGameweek;
   const [homeInput, setHomeInput] = useState(
     prediction?.home_score_prediction?.toString() ?? "",
   );
@@ -59,7 +62,7 @@ function MatchCard({
         <span>{match.away_team}</span>
       </div>
 
-      {!kickedOff ? (
+      {canPredict ? (
         <div className="space-y-2 pt-2">
           <div className="grid grid-cols-3 gap-2">
             {(["HOME", "DRAW", "AWAY"] as PredictionChoice[]).map((choice) => (
@@ -132,6 +135,10 @@ function MatchCard({
                 </span>
               )}
             </div>
+          ) : !kickedOff ? (
+            <span className="text-slate-500">
+              Locked - opens once the current gameweek finishes
+            </span>
           ) : (
             <span className="text-slate-500">No prediction made</span>
           )}
@@ -240,6 +247,7 @@ export default function Matches() {
               prediction={predictionByMatch.get(match.id)}
               onPredict={handlePredict}
               onPredictExact={handlePredictExact}
+              isCurrentGameweek={gameweek === currentGameweek}
             />
           ))}
         </div>
