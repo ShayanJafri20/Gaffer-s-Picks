@@ -7,6 +7,7 @@ class Settings(BaseSettings):
     database_url: str
     jwt_secret: str
     football_api_key: str = ""
+    frontend_url: str = "http://localhost:5173"
 
 
 settings = Settings()

@@ -1,0 +1,21 @@
+services:
+  - name: gaffers-picks-api
+    type: web
+    runtime: python
+    plan: free
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    preDeployCommand: alembic upgrade head
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - name: PYTHON_VERSION
+        value: 3.12.0
+      - name: DATABASE_URL
+        sync: false
+      - name: JWT_SECRET
+        sync: false
+      - name: FOOTBALL_API_KEY
+        sync: false
+      - name: FRONTEND_URL
+        sync: false

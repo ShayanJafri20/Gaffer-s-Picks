@@ -4,6 +4,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api import admin, auth, contributions, leaderboard, matches, predictions, standings
+from app.core.config import settings
 from app.jobs.scheduler import start_scheduler, stop_scheduler
 
 
@@ -18,7 +19,7 @@ app = FastAPI(title="Gaffer's Picks API", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=["http://localhost:5173", settings.frontend_url],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
