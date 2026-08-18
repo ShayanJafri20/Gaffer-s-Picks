@@ -1,36 +1,37 @@
-import { useEffect, useState } from 'react'
+import { Navigate, Route, Routes } from "react-router-dom";
+import { useAuth } from "./contexts/AuthContext";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import Dashboard from "./pages/Dashboard";
 
-function App() {
-  const [status, setStatus] = useState<'checking' | 'up' | 'down'>('checking')
-
-  useEffect(() => {
-    fetch('http://localhost:8000/health')
-      .then((res) => res.json())
-      .then((data) => setStatus(data.status === 'ok' ? 'up' : 'down'))
-      .catch(() => setStatus('down'))
-  }, [])
-
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-900 text-white">
-      <div className="text-center space-y-2">
-        <h1 className="text-3xl font-bold">Prediction Game</h1>
-        <p className="text-slate-400">
-          Backend status:{' '}
-          <span
-            className={
-              status === 'up'
-                ? 'text-green-400'
-                : status === 'down'
-                  ? 'text-red-400'
-                  : 'text-yellow-400'
-            }
-          >
-            {status}
-          </span>
-        </p>
+function ProtectedRoute({ children }: { children: React.ReactNode }) {
+  const { user, loading } = useAuth();
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-900 text-slate-400">
+        Loading...
       </div>
-    </div>
-  )
+    );
+  }
+  if (!user) return <Navigate to="/login" replace />;
+  return <>{children}</>;
 }
 
-export default App
+function App() {
+  return (
+    <Routes>
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+      <Route
+        path="/"
+        element={
+          <ProtectedRoute>
+            <Dashboard />
+          </ProtectedRoute>
+        }
+      />
+    </Routes>
+  );
+}
+
+export default App;
