@@ -19,6 +19,9 @@ export default function Nav() {
           <NavLink to="/matches" className={linkClass}>
             Matches
           </NavLink>
+          <NavLink to="/table" className={linkClass}>
+            Table
+          </NavLink>
           <NavLink to="/leaderboard" className={linkClass}>
             Leaderboard
           </NavLink>

@@ -104,6 +104,20 @@ export interface PrizePool {
   contributions: Contribution[];
 }
 
+export interface StandingsRow {
+  position: number;
+  team_name: string;
+  team_crest: string | null;
+  played: number;
+  won: number;
+  draw: number;
+  lost: number;
+  goals_for: number;
+  goals_against: number;
+  goal_difference: number;
+  points: number;
+}
+
 export const api = {
   register: (username: string, email: string, password: string) =>
     request<User>("/auth/register", {
@@ -174,4 +188,6 @@ export const api = {
 
   adminDeleteUser: (userId: number) =>
     request<void>(`/admin/users/${userId}`, { method: "DELETE" }),
+
+  standings: () => request<StandingsRow[]>("/standings"),
 };
