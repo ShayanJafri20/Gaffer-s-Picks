@@ -44,3 +44,13 @@ def login(payload: UserLogin, db: Session = Depends(get_db)):
 @router.get("/me", response_model=UserOut)
 def me(current_user: User = Depends(get_current_user)):
     return current_user
+
+
+@router.post("/acknowledge-rules", response_model=UserOut)
+def acknowledge_rules(
+    db: Session = Depends(get_db), current_user: User = Depends(get_current_user)
+):
+    current_user.has_seen_rules = True
+    db.commit()
+    db.refresh(current_user)
+    return current_user

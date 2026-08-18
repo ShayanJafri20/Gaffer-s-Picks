@@ -39,6 +39,7 @@ export interface User {
   username: string;
   email: string;
   is_admin: boolean;
+  has_seen_rules: boolean;
   created_at: string;
 }
 
@@ -117,6 +118,8 @@ export const api = {
     }),
 
   me: () => request<User>("/auth/me"),
+
+  acknowledgeRules: () => request<User>("/auth/acknowledge-rules", { method: "POST" }),
 
   matches: (gameweek?: number) =>
     request<Match[]>(gameweek ? `/matches?gameweek=${gameweek}` : "/matches"),

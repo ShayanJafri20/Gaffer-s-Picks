@@ -25,6 +25,9 @@ export default function Nav() {
           <NavLink to="/prize-pool" className={linkClass}>
             Prize Pool
           </NavLink>
+          <NavLink to="/rules" className={linkClass}>
+            Rules
+          </NavLink>
           {user?.is_admin && (
             <NavLink to="/admin" className={linkClass}>
               Admin

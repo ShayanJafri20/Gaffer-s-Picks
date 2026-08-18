@@ -6,6 +6,7 @@ import Dashboard from "./pages/Dashboard";
 import Matches from "./pages/Matches";
 import Leaderboard from "./pages/Leaderboard";
 import PrizePool from "./pages/PrizePool";
+import Rules from "./pages/Rules";
 import Admin from "./pages/Admin";
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -63,6 +64,14 @@ function App() {
         element={
           <ProtectedRoute>
             <PrizePool />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/rules"
+        element={
+          <ProtectedRoute>
+            <Rules />
           </ProtectedRoute>
         }
       />
