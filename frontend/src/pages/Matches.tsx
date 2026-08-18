@@ -4,6 +4,8 @@ import { api, ApiError, type Match, type Prediction, type PredictionChoice } fro
 import { useAuth } from "../contexts/AuthContext";
 import Layout from "../components/Layout";
 
+const MAX_GAMEWEEK = 38;
+
 function formatKickoff(iso: string) {
   const formatted = new Date(iso).toLocaleString("en-GB", {
     timeZone: "Asia/Karachi",
@@ -261,8 +263,9 @@ export default function Matches() {
             &larr; Prev
           </button>
           <button
-            onClick={() => setGameweek((w) => (w ?? 1) + 1)}
-            className="px-3 py-1.5 rounded bg-slate-800 hover:bg-slate-700 text-sm text-slate-200"
+            onClick={() => setGameweek((w) => Math.min(MAX_GAMEWEEK, (w ?? 1) + 1))}
+            disabled={gameweek === MAX_GAMEWEEK}
+            className="px-3 py-1.5 rounded bg-slate-800 hover:bg-slate-700 text-sm text-slate-200 disabled:opacity-40"
           >
             Next &rarr;
           </button>
