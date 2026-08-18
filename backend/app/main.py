@@ -1,9 +1,20 @@
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api import admin, auth, contributions, leaderboard, matches, predictions
+from app.jobs.scheduler import start_scheduler, stop_scheduler
 
-app = FastAPI(title="Prediction Game API")
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    start_scheduler()
+    yield
+    stop_scheduler()
+
+
+app = FastAPI(title="Prediction Game API", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
