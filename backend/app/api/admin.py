@@ -5,6 +5,7 @@ from app.api.deps import get_current_admin
 from app.database.connection import get_db
 from app.jobs.sync_matches import sync_matches
 from app.models.user import User
+from app.services.scoring import score_all_finished_matches
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 
@@ -15,3 +16,11 @@ def trigger_sync_fixtures(
     _admin: User = Depends(get_current_admin),
 ):
     return sync_matches(db)
+
+
+@router.post("/recalculate-points")
+def trigger_recalculate_points(
+    db: Session = Depends(get_db),
+    _admin: User = Depends(get_current_admin),
+):
+    return score_all_finished_matches(db)

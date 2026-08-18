@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 
 from app.models.match import Match, MatchStatus
 from app.services.football_api import fetch_premier_league_matches
+from app.services.scoring import score_match
 
 STATUS_MAP = {
     "SCHEDULED": MatchStatus.SCHEDULED,
@@ -27,6 +28,7 @@ def sync_matches(db: Session) -> dict:
 
     created = 0
     updated = 0
+    newly_finished: list[Match] = []
 
     for raw in raw_matches:
         external_id = str(raw["id"])
@@ -49,10 +51,26 @@ def sync_matches(db: Session) -> dict:
         if existing:
             for key, value in fields.items():
                 setattr(existing, key, value)
+            match = existing
             updated += 1
         else:
-            db.add(Match(external_match_id=external_id, **fields))
+            match = Match(external_match_id=external_id, **fields)
+            db.add(match)
             created += 1
 
+        if match.status == MatchStatus.FINISHED and not match.points_processed:
+            newly_finished.append(match)
+
     db.commit()
-    return {"created": created, "updated": updated, "total_fetched": len(raw_matches)}
+
+    predictions_scored = 0
+    for match in newly_finished:
+        predictions_scored += score_match(db, match)
+
+    return {
+        "created": created,
+        "updated": updated,
+        "total_fetched": len(raw_matches),
+        "matches_newly_finished": len(newly_finished),
+        "predictions_scored": predictions_scored,
+    }
