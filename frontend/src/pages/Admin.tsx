@@ -75,6 +75,16 @@ export default function Admin() {
     }
   }
 
+  async function toggleHidden(u: User) {
+    setError("");
+    try {
+      await api.adminUpdateUser(u.id, { hide_from_leaderboard: !u.hide_from_leaderboard });
+      load();
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : "Failed to update user");
+    }
+  }
+
   async function handleDelete(u: User) {
     if (!confirm(`Remove ${u.username}? This deletes their predictions and contributions too.`)) {
       return;
@@ -148,6 +158,7 @@ export default function Admin() {
                 <th className="px-4 py-3">Username</th>
                 <th className="px-4 py-3">Email</th>
                 <th className="px-4 py-3">Admin</th>
+                <th className="px-4 py-3">Leaderboard</th>
                 <th className="px-4 py-3 text-right">Actions</th>
               </tr>
             </thead>
@@ -171,6 +182,9 @@ export default function Admin() {
                         />
                       </td>
                       <td className="px-4 py-2 text-slate-400">{u.is_admin ? "Yes" : "No"}</td>
+                      <td className="px-4 py-2 text-slate-400">
+                        {u.hide_from_leaderboard ? "Hidden" : "Visible"}
+                      </td>
                       <td className="px-4 py-2 text-right space-x-2">
                         <button
                           onClick={() => saveEdit(u.id)}
@@ -201,6 +215,18 @@ export default function Admin() {
                           } disabled:opacity-50`}
                         >
                           {u.is_admin ? "Admin" : "Make admin"}
+                        </button>
+                      </td>
+                      <td className="px-4 py-3">
+                        <button
+                          onClick={() => toggleHidden(u)}
+                          className={`text-xs px-2 py-1 rounded ${
+                            u.hide_from_leaderboard
+                              ? "bg-slate-700 text-slate-400"
+                              : "bg-green-900/40 text-green-300"
+                          }`}
+                        >
+                          {u.hide_from_leaderboard ? "Hidden" : "Visible"}
                         </button>
                       </td>
                       <td className="px-4 py-3 text-right space-x-2">

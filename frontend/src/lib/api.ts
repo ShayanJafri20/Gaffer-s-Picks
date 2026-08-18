@@ -40,6 +40,7 @@ export interface User {
   email: string;
   is_admin: boolean;
   has_seen_rules: boolean;
+  hide_from_leaderboard: boolean;
   created_at: string;
 }
 
@@ -179,7 +180,12 @@ export const api = {
 
   adminUpdateUser: (
     userId: number,
-    updates: Partial<{ username: string; email: string; is_admin: boolean }>,
+    updates: Partial<{
+      username: string;
+      email: string;
+      is_admin: boolean;
+      hide_from_leaderboard: boolean;
+    }>,
   ) =>
     request<User>(`/admin/users/${userId}`, {
       method: "PATCH",

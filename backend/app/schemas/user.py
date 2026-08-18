@@ -20,6 +20,7 @@ class UserOut(BaseModel):
     email: EmailStr
     is_admin: bool
     has_seen_rules: bool
+    hide_from_leaderboard: bool
     created_at: datetime
 
     model_config = {"from_attributes": True}
@@ -41,3 +42,4 @@ class AdminUserUpdate(BaseModel):
     username: str | None = Field(default=None, min_length=2, max_length=50)
     email: EmailStr | None = None
     is_admin: bool | None = None
+    hide_from_leaderboard: bool | None = None

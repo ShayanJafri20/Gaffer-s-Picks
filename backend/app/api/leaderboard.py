@@ -12,7 +12,11 @@ router = APIRouter(prefix="/leaderboard", tags=["leaderboard"])
 
 
 def _ranked_rows(db: Session):
-    """Every user, ranked by total points (users with zero predictions still appear)."""
+    """Every non-hidden user, ranked by total points.
+
+    Admins and accounts explicitly flagged hide_from_leaderboard (e.g. test
+    accounts) never appear here - they're not real competing friends.
+    """
     rows = (
         db.query(
             User.id.label("user_id"),
@@ -24,6 +28,7 @@ def _ranked_rows(db: Session):
             func.count(Prediction.id).label("total_predictions"),
         )
         .outerjoin(Prediction, Prediction.user_id == User.id)
+        .filter(User.hide_from_leaderboard == False, User.is_admin == False)  # noqa: E712
         .group_by(User.id, User.username)
         .order_by(func.coalesce(func.sum(Prediction.points), 0).desc())
         .all()
