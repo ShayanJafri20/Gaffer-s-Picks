@@ -18,7 +18,7 @@ class Prediction(Base):
     __table_args__ = (UniqueConstraint("user_id", "match_id", name="uq_user_match_prediction"),)
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
     match_id: Mapped[int] = mapped_column(ForeignKey("matches.id"), nullable=False)
     prediction: Mapped[PredictionChoice] = mapped_column(
         Enum(PredictionChoice, name="prediction_choice"), nullable=False

@@ -25,6 +25,11 @@ export default function Nav() {
           <NavLink to="/prize-pool" className={linkClass}>
             Prize Pool
           </NavLink>
+          {user?.is_admin && (
+            <NavLink to="/admin" className={linkClass}>
+              Admin
+            </NavLink>
+          )}
         </div>
         <div className="flex items-center gap-3">
           <span className="text-slate-400 text-sm">{user?.username}</span>

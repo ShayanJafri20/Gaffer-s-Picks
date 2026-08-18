@@ -27,6 +27,10 @@ async function request<T>(
     throw new ApiError(res.status, body.detail ?? "Request failed");
   }
 
+  if (res.status === 204) {
+    return undefined as T;
+  }
+
   return res.json();
 }
 
@@ -134,4 +138,24 @@ export const api = {
       method: "POST",
       body: JSON.stringify({ amount }),
     }),
+
+  adminListUsers: () => request<User[]>("/admin/users"),
+
+  adminCreateUser: (username: string, email: string, password: string, is_admin: boolean) =>
+    request<User>("/admin/users", {
+      method: "POST",
+      body: JSON.stringify({ username, email, password, is_admin }),
+    }),
+
+  adminUpdateUser: (
+    userId: number,
+    updates: Partial<{ username: string; email: string; is_admin: boolean }>,
+  ) =>
+    request<User>(`/admin/users/${userId}`, {
+      method: "PATCH",
+      body: JSON.stringify(updates),
+    }),
+
+  adminDeleteUser: (userId: number) =>
+    request<void>(`/admin/users/${userId}`, { method: "DELETE" }),
 };
