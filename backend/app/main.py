@@ -14,7 +14,7 @@ async def lifespan(app: FastAPI):
     stop_scheduler()
 
 
-app = FastAPI(title="Prediction Game API", lifespan=lifespan)
+app = FastAPI(title="Gaffer's Picks API", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,

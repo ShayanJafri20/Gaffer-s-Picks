@@ -2,6 +2,7 @@ import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { ApiError } from "../lib/api";
+import AuthLayout from "../components/AuthLayout";
 
 export default function Login() {
   const { login } = useAuth();
@@ -26,43 +27,45 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-900">
-      <form
-        onSubmit={handleSubmit}
-        className="bg-slate-800 p-8 rounded-lg w-full max-w-sm space-y-4"
-      >
-        <h1 className="text-2xl font-bold text-white">Log in</h1>
+    <AuthLayout title="Welcome back">
+      <form onSubmit={handleSubmit} className="space-y-4">
         {error && <p className="text-red-400 text-sm">{error}</p>}
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-          className="w-full px-3 py-2 rounded bg-slate-700 text-white placeholder-slate-400"
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-          className="w-full px-3 py-2 rounded bg-slate-700 text-white placeholder-slate-400"
-        />
+        <div>
+          <label className="text-slate-400 text-xs font-medium">Email</label>
+          <input
+            type="email"
+            placeholder="you@example.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            className="w-full mt-1 px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:border-purple-500"
+          />
+        </div>
+        <div>
+          <label className="text-slate-400 text-xs font-medium">Password</label>
+          <input
+            type="password"
+            placeholder="••••••••"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            className="w-full mt-1 px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:border-purple-500"
+          />
+        </div>
         <button
           type="submit"
           disabled={submitting}
-          className="w-full py-2 rounded bg-purple-600 hover:bg-purple-500 text-white font-medium disabled:opacity-50"
+          className="w-full py-2.5 rounded-lg bg-purple-600 hover:bg-purple-500 text-white font-semibold transition-colors disabled:opacity-50"
         >
           {submitting ? "Logging in..." : "Log in"}
         </button>
         <p className="text-slate-400 text-sm text-center">
           No account?{" "}
-          <Link to="/register" className="text-purple-400 hover:underline">
+          <Link to="/register" className="text-purple-400 hover:text-purple-300 font-medium">
             Register
           </Link>
         </p>
       </form>
-    </div>
+    </AuthLayout>
   );
 }
