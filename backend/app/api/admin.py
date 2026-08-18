@@ -45,7 +45,7 @@ def create_user(
 ):
     user = User(
         username=payload.username,
-        email=payload.email,
+        email=payload.email.lower(),
         password_hash=hash_password(payload.password),
         is_admin=payload.is_admin,
     )
@@ -80,6 +80,8 @@ def update_user(
         )
 
     updates = payload.model_dump(exclude_unset=True)
+    if "email" in updates:
+        updates["email"] = updates["email"].lower()
     for key, value in updates.items():
         setattr(user, key, value)
 
