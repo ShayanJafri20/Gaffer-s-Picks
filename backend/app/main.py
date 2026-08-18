@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import admin, auth, leaderboard, matches, predictions
+from app.api import admin, auth, contributions, leaderboard, matches, predictions
 
 app = FastAPI(title="Prediction Game API")
 
@@ -17,6 +17,7 @@ app.include_router(auth.router)
 app.include_router(matches.router)
 app.include_router(predictions.router)
 app.include_router(leaderboard.router)
+app.include_router(contributions.router)
 app.include_router(admin.router)
 
 
