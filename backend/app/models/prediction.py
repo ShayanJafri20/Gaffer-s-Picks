@@ -23,6 +23,8 @@ class Prediction(Base):
     prediction: Mapped[PredictionChoice] = mapped_column(
         Enum(PredictionChoice, name="prediction_choice"), nullable=False
     )
+    home_score_prediction: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    away_score_prediction: Mapped[int | None] = mapped_column(Integer, nullable=True)
     points: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)

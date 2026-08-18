@@ -4,6 +4,7 @@ from app.models.match import Match, MatchStatus
 from app.models.prediction import Prediction, PredictionChoice
 
 POINTS_FOR_CORRECT_OUTCOME = 3
+POINTS_FOR_EXACT_SCORE = 5
 
 
 def determine_outcome(home_score: int, away_score: int) -> PredictionChoice:
@@ -30,9 +31,17 @@ def score_match(db: Session, match: Match) -> int:
     predictions = db.query(Prediction).filter(Prediction.match_id == match.id).all()
 
     for prediction in predictions:
-        prediction.points = (
-            POINTS_FOR_CORRECT_OUTCOME if prediction.prediction == outcome else 0
+        exact_score = (
+            prediction.home_score_prediction == match.home_score
+            and prediction.away_score_prediction == match.away_score
+            and prediction.home_score_prediction is not None
         )
+        if exact_score:
+            prediction.points = POINTS_FOR_EXACT_SCORE
+        elif prediction.prediction == outcome:
+            prediction.points = POINTS_FOR_CORRECT_OUTCOME
+        else:
+            prediction.points = 0
 
     match.points_processed = True
     db.commit()

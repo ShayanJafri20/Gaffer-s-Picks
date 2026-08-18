@@ -3,26 +3,40 @@ import { api, ApiError, type Match, type Prediction, type PredictionChoice } fro
 import Layout from "../components/Layout";
 
 function formatKickoff(iso: string) {
-  return new Date(iso).toLocaleString(undefined, {
+  const formatted = new Date(iso).toLocaleString("en-GB", {
+    timeZone: "Asia/Karachi",
     weekday: "short",
     month: "short",
     day: "numeric",
     hour: "2-digit",
     minute: "2-digit",
   });
+  return `${formatted} PKT`;
 }
 
 function MatchCard({
   match,
   prediction,
   onPredict,
+  onPredictExact,
 }: {
   match: Match;
   prediction: Prediction | undefined;
   onPredict: (matchId: number, choice: PredictionChoice) => void;
+  onPredictExact: (matchId: number, home: number, away: number) => void;
 }) {
   const kickedOff = new Date(match.kickoff_time).getTime() <= Date.now();
   const isFinished = match.status === "FINISHED";
+  const [homeInput, setHomeInput] = useState(
+    prediction?.home_score_prediction?.toString() ?? "",
+  );
+  const [awayInput, setAwayInput] = useState(
+    prediction?.away_score_prediction?.toString() ?? "",
+  );
+
+  const wasExactScore =
+    prediction?.home_score_prediction !== null &&
+    prediction?.home_score_prediction !== undefined;
 
   return (
     <div className="bg-slate-800 rounded-lg p-4 space-y-3">
@@ -46,27 +60,69 @@ function MatchCard({
       </div>
 
       {!kickedOff ? (
-        <div className="grid grid-cols-3 gap-2 pt-2">
-          {(["HOME", "DRAW", "AWAY"] as PredictionChoice[]).map((choice) => (
+        <div className="space-y-2 pt-2">
+          <div className="grid grid-cols-3 gap-2">
+            {(["HOME", "DRAW", "AWAY"] as PredictionChoice[]).map((choice) => (
+              <button
+                key={choice}
+                onClick={() => onPredict(match.id, choice)}
+                className={`py-2 rounded text-sm font-medium ${
+                  prediction?.prediction === choice && !wasExactScore
+                    ? "bg-purple-600 text-white"
+                    : "bg-slate-700 hover:bg-slate-600 text-slate-200"
+                }`}
+              >
+                {choice === "HOME"
+                  ? match.home_team
+                  : choice === "AWAY"
+                    ? match.away_team
+                    : "Draw"}
+              </button>
+            ))}
+          </div>
+          <div className="flex items-center gap-2 text-sm">
+            <span className="text-slate-500">Exact score (bonus +5):</span>
+            <input
+              type="number"
+              min="0"
+              value={homeInput}
+              onChange={(e) => setHomeInput(e.target.value)}
+              className="w-14 px-2 py-1 rounded bg-slate-700 text-white text-center"
+            />
+            <span className="text-slate-500">-</span>
+            <input
+              type="number"
+              min="0"
+              value={awayInput}
+              onChange={(e) => setAwayInput(e.target.value)}
+              className="w-14 px-2 py-1 rounded bg-slate-700 text-white text-center"
+            />
             <button
-              key={choice}
-              onClick={() => onPredict(match.id, choice)}
-              className={`py-2 rounded text-sm font-medium ${
-                prediction?.prediction === choice
-                  ? "bg-purple-600 text-white"
-                  : "bg-slate-700 hover:bg-slate-600 text-slate-200"
-              }`}
+              onClick={() => {
+                const home = Number(homeInput);
+                const away = Number(awayInput);
+                if (homeInput !== "" && awayInput !== "" && home >= 0 && away >= 0) {
+                  onPredictExact(match.id, home, away);
+                }
+              }}
+              disabled={homeInput === "" || awayInput === ""}
+              className="px-3 py-1 rounded bg-purple-600 hover:bg-purple-500 text-white disabled:opacity-40"
             >
-              {choice === "HOME" ? match.home_team : choice === "AWAY" ? match.away_team : "Draw"}
+              Save
             </button>
-          ))}
+          </div>
         </div>
       ) : (
         <div className="pt-2 text-sm">
           {prediction ? (
             <div className="flex items-center justify-between">
               <span className="text-slate-400">
-                Your prediction: <span className="text-slate-200">{prediction.prediction}</span>
+                Your prediction:{" "}
+                <span className="text-slate-200">
+                  {wasExactScore
+                    ? `${prediction.home_score_prediction}-${prediction.away_score_prediction}`
+                    : prediction.prediction}
+                </span>
               </span>
               {isFinished && (
                 <span
@@ -129,6 +185,16 @@ export default function Matches() {
     }
   }
 
+  async function handlePredictExact(matchId: number, home: number, away: number) {
+    const choice: PredictionChoice = home > away ? "HOME" : home < away ? "AWAY" : "DRAW";
+    try {
+      const updated = await api.submitPrediction(matchId, choice, home, away);
+      setPredictions((prev) => [updated, ...prev.filter((p) => p.match_id !== matchId)]);
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : "Failed to submit prediction");
+    }
+  }
+
   const predictionByMatch = new Map(predictions.map((p) => [p.match_id, p]));
 
   return (
@@ -173,6 +239,7 @@ export default function Matches() {
               match={match}
               prediction={predictionByMatch.get(match.id)}
               onPredict={handlePredict}
+              onPredictExact={handlePredictExact}
             />
           ))}
         </div>

@@ -65,6 +65,8 @@ export interface Prediction {
   id: number;
   match_id: number;
   prediction: PredictionChoice;
+  home_score_prediction: number | null;
+  away_score_prediction: number | null;
   points: number;
   created_at: string;
   updated_at: string;
@@ -121,10 +123,19 @@ export const api = {
 
   myPredictions: () => request<Prediction[]>("/predictions/me"),
 
-  submitPrediction: (matchId: number, prediction: PredictionChoice) =>
+  submitPrediction: (
+    matchId: number,
+    prediction: PredictionChoice,
+    homeScorePrediction?: number,
+    awayScorePrediction?: number,
+  ) =>
     request<Prediction>(`/matches/${matchId}/prediction`, {
       method: "POST",
-      body: JSON.stringify({ prediction }),
+      body: JSON.stringify({
+        prediction,
+        home_score_prediction: homeScorePrediction ?? null,
+        away_score_prediction: awayScorePrediction ?? null,
+      }),
     }),
 
   leaderboard: () => request<LeaderboardEntry[]>("/leaderboard"),

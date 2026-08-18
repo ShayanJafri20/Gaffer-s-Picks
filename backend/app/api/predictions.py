@@ -38,10 +38,16 @@ def submit_prediction(
 
     if existing:
         existing.prediction = payload.prediction
+        existing.home_score_prediction = payload.home_score_prediction
+        existing.away_score_prediction = payload.away_score_prediction
         prediction = existing
     else:
         prediction = Prediction(
-            user_id=current_user.id, match_id=match_id, prediction=payload.prediction
+            user_id=current_user.id,
+            match_id=match_id,
+            prediction=payload.prediction,
+            home_score_prediction=payload.home_score_prediction,
+            away_score_prediction=payload.away_score_prediction,
         )
         db.add(prediction)
 
