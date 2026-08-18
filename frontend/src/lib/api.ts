@@ -110,7 +110,10 @@ export const api = {
 
   me: () => request<User>("/auth/me"),
 
-  matches: () => request<Match[]>("/matches"),
+  matches: (gameweek?: number) =>
+    request<Match[]>(gameweek ? `/matches?gameweek=${gameweek}` : "/matches"),
+
+  currentGameweek: () => request<{ gameweek: number }>("/matches/current-gameweek"),
 
   myPredictions: () => request<Prediction[]>("/predictions/me"),
 

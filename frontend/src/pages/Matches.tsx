@@ -88,13 +88,16 @@ function MatchCard({
 export default function Matches() {
   const [matches, setMatches] = useState<Match[]>([]);
   const [predictions, setPredictions] = useState<Prediction[]>([]);
+  const [gameweek, setGameweek] = useState<number | null>(null);
+  const [currentGameweek, setCurrentGameweek] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  async function load() {
+  async function load(week: number) {
+    setLoading(true);
     try {
       const [matchList, predictionList] = await Promise.all([
-        api.matches(),
+        api.matches(week),
         api.myPredictions(),
       ]);
       setMatches(matchList);
@@ -107,8 +110,15 @@ export default function Matches() {
   }
 
   useEffect(() => {
-    load();
+    api.currentGameweek().then(({ gameweek }) => {
+      setCurrentGameweek(gameweek);
+      setGameweek(gameweek);
+    });
   }, []);
+
+  useEffect(() => {
+    if (gameweek !== null) load(gameweek);
+  }, [gameweek]);
 
   async function handlePredict(matchId: number, choice: PredictionChoice) {
     try {
@@ -123,13 +133,37 @@ export default function Matches() {
 
   return (
     <Layout>
-      <h1 className="text-2xl font-bold text-white mb-6">Matches</h1>
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-2xl font-bold text-white">
+          Gameweek {gameweek ?? "..."}
+          {gameweek === currentGameweek && (
+            <span className="ml-2 text-xs uppercase tracking-wide text-purple-400 align-middle">
+              Current
+            </span>
+          )}
+        </h1>
+        <div className="flex gap-2">
+          <button
+            onClick={() => setGameweek((w) => Math.max(1, (w ?? 1) - 1))}
+            disabled={gameweek === 1}
+            className="px-3 py-1.5 rounded bg-slate-800 hover:bg-slate-700 text-sm text-slate-200 disabled:opacity-40"
+          >
+            &larr; Prev
+          </button>
+          <button
+            onClick={() => setGameweek((w) => (w ?? 1) + 1)}
+            className="px-3 py-1.5 rounded bg-slate-800 hover:bg-slate-700 text-sm text-slate-200"
+          >
+            Next &rarr;
+          </button>
+        </div>
+      </div>
       {error && <p className="text-red-400 mb-4">{error}</p>}
       {loading ? (
         <p className="text-slate-400">Loading...</p>
       ) : matches.length === 0 ? (
         <p className="text-slate-400">
-          No matches yet. Once fixtures are synced from the Premier League, they'll show up here.
+          No matches in this gameweek.
         </p>
       ) : (
         <div className="space-y-3">
