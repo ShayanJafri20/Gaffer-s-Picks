@@ -43,6 +43,58 @@ export interface Token {
   token_type: string;
 }
 
+export type MatchStatus = "SCHEDULED" | "LIVE" | "FINISHED" | "POSTPONED";
+export type PredictionChoice = "HOME" | "DRAW" | "AWAY";
+
+export interface Match {
+  id: number;
+  gameweek: number;
+  home_team: string;
+  away_team: string;
+  kickoff_time: string;
+  home_score: number | null;
+  away_score: number | null;
+  status: MatchStatus;
+}
+
+export interface Prediction {
+  id: number;
+  match_id: number;
+  prediction: PredictionChoice;
+  points: number;
+  created_at: string;
+  updated_at: string;
+  locked_at: string | null;
+}
+
+export interface LeaderboardEntry {
+  rank: number;
+  user_id: number;
+  username: string;
+  total_points: number;
+  correct_predictions: number;
+  total_predictions: number;
+}
+
+export interface MyRank {
+  rank: number;
+  total_points: number;
+  correct_predictions: number;
+  total_predictions: number;
+}
+
+export interface Contribution {
+  id: number;
+  user_id: number;
+  amount: string;
+  created_at: string;
+}
+
+export interface PrizePool {
+  total: string;
+  contributions: Contribution[];
+}
+
 export const api = {
   register: (username: string, email: string, password: string) =>
     request<User>("/auth/register", {
@@ -57,4 +109,26 @@ export const api = {
     }),
 
   me: () => request<User>("/auth/me"),
+
+  matches: () => request<Match[]>("/matches"),
+
+  myPredictions: () => request<Prediction[]>("/predictions/me"),
+
+  submitPrediction: (matchId: number, prediction: PredictionChoice) =>
+    request<Prediction>(`/matches/${matchId}/prediction`, {
+      method: "POST",
+      body: JSON.stringify({ prediction }),
+    }),
+
+  leaderboard: () => request<LeaderboardEntry[]>("/leaderboard"),
+
+  myRank: () => request<MyRank>("/leaderboard/me"),
+
+  prizePool: () => request<PrizePool>("/contributions"),
+
+  addContribution: (amount: number) =>
+    request<Contribution>("/contributions", {
+      method: "POST",
+      body: JSON.stringify({ amount }),
+    }),
 };

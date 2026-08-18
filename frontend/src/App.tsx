@@ -3,6 +3,9 @@ import { useAuth } from "./contexts/AuthContext";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
+import Matches from "./pages/Matches";
+import Leaderboard from "./pages/Leaderboard";
+import PrizePool from "./pages/PrizePool";
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
@@ -27,6 +30,30 @@ function App() {
         element={
           <ProtectedRoute>
             <Dashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/matches"
+        element={
+          <ProtectedRoute>
+            <Matches />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/leaderboard"
+        element={
+          <ProtectedRoute>
+            <Leaderboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/prize-pool"
+        element={
+          <ProtectedRoute>
+            <PrizePool />
           </ProtectedRoute>
         }
       />

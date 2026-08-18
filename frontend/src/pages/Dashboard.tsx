@@ -1,29 +1,67 @@
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
+import { api, type MyRank, type PrizePool } from "../lib/api";
+import Layout from "../components/Layout";
 
 export default function Dashboard() {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
+  const [rank, setRank] = useState<MyRank | null>(null);
+  const [pool, setPool] = useState<PrizePool | null>(null);
+
+  useEffect(() => {
+    api.myRank().then(setRank).catch(() => {});
+    api.prizePool().then(setPool).catch(() => {});
+  }, []);
 
   return (
-    <div className="min-h-screen bg-slate-900 text-white p-8">
-      <div className="max-w-3xl mx-auto space-y-6">
-        <div className="flex justify-between items-center">
-          <h1 className="text-2xl font-bold">Prediction Game</h1>
-          <button
-            onClick={logout}
-            className="px-4 py-2 rounded bg-slate-700 hover:bg-slate-600 text-sm"
+    <Layout>
+      <div className="space-y-6">
+        <div>
+          <p className="text-slate-400">Welcome back,</p>
+          <p className="text-2xl font-bold text-white">{user?.username}</p>
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <div className="bg-slate-800 rounded-lg p-4">
+            <p className="text-slate-400 text-sm">Your Rank</p>
+            <p className="text-2xl font-bold text-white">
+              {rank ? `#${rank.rank}` : "..."}
+            </p>
+          </div>
+          <div className="bg-slate-800 rounded-lg p-4">
+            <p className="text-slate-400 text-sm">Total Points</p>
+            <p className="text-2xl font-bold text-white">{rank?.total_points ?? "..."}</p>
+          </div>
+          <div className="bg-slate-800 rounded-lg p-4">
+            <p className="text-slate-400 text-sm">Correct Picks</p>
+            <p className="text-2xl font-bold text-white">
+              {rank ? `${rank.correct_predictions}/${rank.total_predictions}` : "..."}
+            </p>
+          </div>
+          <div className="bg-slate-800 rounded-lg p-4">
+            <p className="text-slate-400 text-sm">Prize Pool</p>
+            <p className="text-2xl font-bold text-white">
+              {pool ? `Rs. ${Number(pool.total).toLocaleString()}` : "..."}
+            </p>
+          </div>
+        </div>
+
+        <div className="flex gap-3">
+          <Link
+            to="/matches"
+            className="px-4 py-2 rounded bg-purple-600 hover:bg-purple-500 text-white text-sm font-medium"
           >
-            Log out
-          </button>
+            Make Predictions
+          </Link>
+          <Link
+            to="/leaderboard"
+            className="px-4 py-2 rounded bg-slate-800 hover:bg-slate-700 text-white text-sm font-medium"
+          >
+            View Leaderboard
+          </Link>
         </div>
-        <div className="bg-slate-800 rounded-lg p-6">
-          <p className="text-slate-400">Welcome,</p>
-          <p className="text-xl font-semibold">{user?.username}</p>
-          <p className="text-slate-500 text-sm mt-1">{user?.email}</p>
-        </div>
-        <p className="text-slate-500 text-sm">
-          Matches, predictions, and the leaderboard will show up here next.
-        </p>
       </div>
-    </div>
+    </Layout>
   );
 }
