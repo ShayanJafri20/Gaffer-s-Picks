@@ -1,9 +1,16 @@
 import { useEffect, useState, type FormEvent } from "react";
-import { api, ApiError, type PrizePool as PrizePoolData } from "../lib/api";
+import { api, ApiError, type LeaderboardEntry, type PrizePool as PrizePoolData } from "../lib/api";
 import Layout from "../components/Layout";
+
+const PRIZE_SPLIT = [
+  { place: "1st", pct: 0.6, color: "text-yellow-400" },
+  { place: "2nd", pct: 0.2, color: "text-slate-300" },
+  { place: "3rd", pct: 0.1, color: "text-orange-400" },
+];
 
 export default function PrizePool() {
   const [data, setData] = useState<PrizePoolData | null>(null);
+  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [amount, setAmount] = useState("");
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -13,6 +20,7 @@ export default function PrizePool() {
       .prizePool()
       .then(setData)
       .catch((err) => setError(err instanceof ApiError ? err.message : "Failed to load prize pool"));
+    api.leaderboard().then(setLeaderboard).catch(() => {});
   }
 
   useEffect(() => {
@@ -48,6 +56,31 @@ export default function PrizePool() {
           Informational only — this app does not process real payments. The prize is
           settled between you and your friends outside the app.
         </p>
+      </div>
+
+      <div className="bg-slate-800 rounded-lg p-6 mb-6">
+        <p className="text-white font-semibold mb-1">Prize Breakdown</p>
+        <p className="text-slate-500 text-xs mb-4">
+          60% to 1st, 20% to 2nd, 10% to 3rd — based on current leaderboard standing, not
+          final until the season ends.
+        </p>
+        <div className="grid grid-cols-3 gap-3">
+          {PRIZE_SPLIT.map(({ place, pct, color }, i) => {
+            const total = data ? Number(data.total) : 0;
+            const entry = leaderboard[i];
+            return (
+              <div key={place} className="bg-slate-900 rounded-lg p-3 text-center">
+                <p className={`text-xs font-semibold uppercase ${color}`}>{place}</p>
+                <p className="text-white font-medium truncate mt-1">
+                  {entry ? entry.username : "-"}
+                </p>
+                <p className="text-slate-400 text-sm mt-1">
+                  Rs. {Math.round(total * pct).toLocaleString()}
+                </p>
+              </div>
+            );
+          })}
+        </div>
       </div>
 
       <form onSubmit={handleSubmit} className="bg-slate-800 rounded-lg p-4 flex gap-2 mb-6">
