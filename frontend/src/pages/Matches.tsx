@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { api, ApiError, type Match, type Prediction, type PredictionChoice } from "../lib/api";
+import { useAuth } from "../contexts/AuthContext";
 import Layout from "../components/Layout";
 
 function formatKickoff(iso: string) {
@@ -20,16 +22,18 @@ function MatchCard({
   onPredict,
   onPredictExact,
   isCurrentGameweek,
+  hasContributed,
 }: {
   match: Match;
   prediction: Prediction | undefined;
   onPredict: (matchId: number, choice: PredictionChoice) => void;
   onPredictExact: (matchId: number, home: number, away: number) => void;
   isCurrentGameweek: boolean;
+  hasContributed: boolean;
 }) {
   const kickedOff = new Date(match.kickoff_time).getTime() <= Date.now();
   const isFinished = match.status === "FINISHED";
-  const canPredict = !kickedOff && isCurrentGameweek;
+  const canPredict = !kickedOff && isCurrentGameweek && hasContributed;
   const [homeInput, setHomeInput] = useState(
     prediction?.home_score_prediction?.toString() ?? "",
   );
@@ -156,6 +160,8 @@ function MatchCard({
                 </span>
               )}
             </div>
+          ) : !hasContributed ? (
+            <span className="text-slate-500">Add your contribution to unlock predictions</span>
           ) : !kickedOff ? (
             <span className="text-slate-500">
               Locked - opens once the current gameweek finishes
@@ -170,12 +176,22 @@ function MatchCard({
 }
 
 export default function Matches() {
+  const { user } = useAuth();
   const [matches, setMatches] = useState<Match[]>([]);
   const [predictions, setPredictions] = useState<Prediction[]>([]);
   const [gameweek, setGameweek] = useState<number | null>(null);
   const [currentGameweek, setCurrentGameweek] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [hasContributed, setHasContributed] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    if (!user) return;
+    api
+      .prizePool()
+      .then((pool) => setHasContributed(pool.contributions.some((c) => c.user_id === user.id)))
+      .catch(() => setHasContributed(true)); // fail open - don't block on a network hiccup
+  }, [user]);
 
   async function load(week: number) {
     setLoading(true);
@@ -253,6 +269,19 @@ export default function Matches() {
         </div>
       </div>
       {error && <p className="text-red-400 mb-4">{error}</p>}
+      {hasContributed === false && (
+        <div className="bg-purple-900/30 border border-purple-700 rounded-lg p-4 mb-6 flex items-center justify-between gap-4">
+          <p className="text-slate-200 text-sm">
+            Add your contribution to the prize pool before you can start predicting.
+          </p>
+          <Link
+            to="/prize-pool"
+            className="px-4 py-2 rounded bg-purple-600 hover:bg-purple-500 text-white text-sm font-medium whitespace-nowrap"
+          >
+            Add contribution
+          </Link>
+        </div>
+      )}
       {loading ? (
         <p className="text-slate-400">Loading...</p>
       ) : matches.length === 0 ? (
@@ -269,6 +298,7 @@ export default function Matches() {
               onPredict={handlePredict}
               onPredictExact={handlePredictExact}
               isCurrentGameweek={gameweek === currentGameweek}
+              hasContributed={hasContributed !== false}
             />
           ))}
         </div>

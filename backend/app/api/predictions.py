@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 
 from app.api.deps import get_current_user
 from app.database.connection import get_db
+from app.models.contribution import Contribution
 from app.models.match import Match
 from app.models.prediction import Prediction
 from app.models.user import User
@@ -21,6 +22,16 @@ def submit_prediction(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
+    has_contributed = (
+        db.query(Contribution).filter(Contribution.user_id == current_user.id).first()
+        is not None
+    )
+    if not has_contributed:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Add your contribution to the prize pool before predicting",
+        )
+
     match = db.get(Match, match_id)
     if match is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Match not found")
