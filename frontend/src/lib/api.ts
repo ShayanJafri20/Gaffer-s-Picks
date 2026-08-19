@@ -41,6 +41,7 @@ export interface User {
   is_admin: boolean;
   has_seen_rules: boolean;
   hide_from_leaderboard: boolean;
+  last_seen_month: string | null;
   created_at: string;
 }
 
@@ -96,13 +97,38 @@ export interface MyRank {
 export interface Contribution {
   id: number;
   user_id: number;
+  username: string;
   amount: string;
+  period: string;
   created_at: string;
 }
 
 export interface PrizePool {
+  period: string;
   total: string;
   contributions: Contribution[];
+  has_contributed: boolean;
+}
+
+export interface MonthlyWinner {
+  rank: number;
+  user_id: number;
+  username: string;
+  points: number;
+  payout: string;
+}
+
+export interface MonthlyResult {
+  period: string;
+  is_current: boolean;
+  total_pool: string;
+  winners: MonthlyWinner[];
+}
+
+export interface MyMonthSummary {
+  period: string;
+  contributed: string;
+  won: string;
 }
 
 export interface StandingsRow {
@@ -135,6 +161,8 @@ export const api = {
   me: () => request<User>("/auth/me"),
 
   acknowledgeRules: () => request<User>("/auth/acknowledge-rules", { method: "POST" }),
+
+  acknowledgeMonth: () => request<User>("/auth/acknowledge-month", { method: "POST" }),
 
   matches: (gameweek?: number) =>
     request<Match[]>(gameweek ? `/matches?gameweek=${gameweek}` : "/matches"),
@@ -196,4 +224,10 @@ export const api = {
     request<void>(`/admin/users/${userId}`, { method: "DELETE" }),
 
   standings: () => request<StandingsRow[]>("/standings"),
+
+  currentMonth: () => request<MonthlyResult>("/monthly/current"),
+
+  monthlyHistory: () => request<MonthlyResult[]>("/monthly/history"),
+
+  myMonthlySummaries: () => request<MyMonthSummary[]>("/monthly/me"),
 };

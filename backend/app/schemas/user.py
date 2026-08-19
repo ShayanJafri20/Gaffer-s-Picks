@@ -21,6 +21,7 @@ class UserOut(BaseModel):
     is_admin: bool
     has_seen_rules: bool
     hide_from_leaderboard: bool
+    last_seen_month: str | None
     created_at: datetime
 
     model_config = {"from_attributes": True}

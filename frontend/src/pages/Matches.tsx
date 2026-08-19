@@ -220,7 +220,7 @@ export default function Matches() {
     if (!user) return;
     api
       .prizePool()
-      .then((pool) => setHasContributed(pool.contributions.some((c) => c.user_id === user.id)))
+      .then((pool) => setHasContributed(pool.has_contributed))
       .catch(() => setHasContributed(true)); // fail open - don't block on a network hiccup
   }, [user]);
 
@@ -295,7 +295,7 @@ export default function Matches() {
       {hasContributed === false && (
         <div className="bg-purple-900/30 border border-purple-700 rounded-lg p-4 mb-6 flex items-center justify-between gap-4">
           <p className="text-slate-200 text-sm">
-            Add your contribution to the prize pool before you can start predicting.
+            Add your contribution to this month's prize pool before you can start predicting.
           </p>
           <Link
             to="/prize-pool"

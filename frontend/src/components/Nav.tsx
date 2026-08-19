@@ -35,6 +35,12 @@ export default function Nav() {
           <NavLink to="/prize-pool" className={linkClass}>
             Prize Pool
           </NavLink>
+          <NavLink to="/prize-history" className={linkClass}>
+            Champions
+          </NavLink>
+          <NavLink to="/my-predictions" className={linkClass}>
+            My Predictions
+          </NavLink>
           <NavLink to="/rules" className={linkClass}>
             Rules
           </NavLink>

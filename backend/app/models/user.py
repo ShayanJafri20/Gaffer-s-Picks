@@ -16,6 +16,7 @@ class User(Base):
     is_admin: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     has_seen_rules: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     hide_from_leaderboard: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    last_seen_month: Mapped[str | None] = mapped_column(String(7), nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
     )
