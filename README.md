@@ -3,8 +3,6 @@
 A private Premier League prediction game built for a small group of friends. Predict
 every gameweek's results, earn points, and compete for a monthly prize pool.
 
-**Live app:** https://gaffers-picks.vercel.app
-
 ---
 
 ## How it works
