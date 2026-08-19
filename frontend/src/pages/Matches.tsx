@@ -18,24 +18,27 @@ function formatKickoff(iso: string) {
   return `${formatted} PKT`;
 }
 
+function outcomeFor(home: number, away: number): PredictionChoice {
+  return home > away ? "HOME" : home < away ? "AWAY" : "DRAW";
+}
+
 function MatchCard({
   match,
   prediction,
-  onPredict,
-  onPredictExact,
+  onSave,
   isCurrentGameweek,
   hasContributed,
 }: {
   match: Match;
   prediction: Prediction | undefined;
-  onPredict: (matchId: number, choice: PredictionChoice) => void;
-  onPredictExact: (matchId: number, home: number, away: number) => void;
+  onSave: (matchId: number, home: number, away: number) => void;
   isCurrentGameweek: boolean;
   hasContributed: boolean;
 }) {
   const kickedOff = new Date(match.kickoff_time).getTime() <= Date.now();
   const isFinished = match.status === "FINISHED";
   const canPredict = !kickedOff && isCurrentGameweek && hasContributed;
+
   const [homeInput, setHomeInput] = useState(
     prediction?.home_score_prediction?.toString() ?? "",
   );
@@ -43,9 +46,35 @@ function MatchCard({
     prediction?.away_score_prediction?.toString() ?? "",
   );
 
-  const wasExactScore =
-    prediction?.home_score_prediction !== null &&
-    prediction?.home_score_prediction !== undefined;
+  // What's currently typed but not necessarily saved yet.
+  const pendingChoice =
+    homeInput !== "" && awayInput !== ""
+      ? outcomeFor(Number(homeInput), Number(awayInput))
+      : null;
+
+  // Whether the current inputs exactly match what's already saved on the server.
+  const isSaved =
+    prediction !== undefined &&
+    prediction.home_score_prediction === (homeInput === "" ? null : Number(homeInput)) &&
+    prediction.away_score_prediction === (awayInput === "" ? null : Number(awayInput));
+
+  function pickTeam(choice: PredictionChoice) {
+    if (choice === "HOME") {
+      setHomeInput("1");
+      setAwayInput("0");
+    } else if (choice === "AWAY") {
+      setHomeInput("0");
+      setAwayInput("1");
+    } else {
+      setHomeInput("0");
+      setAwayInput("0");
+    }
+  }
+
+  function handleSave() {
+    if (homeInput === "" || awayInput === "") return;
+    onSave(match.id, Number(homeInput), Number(awayInput));
+  }
 
   return (
     <div className="bg-slate-800 rounded-lg p-4 space-y-3">
@@ -88,14 +117,18 @@ function MatchCard({
                   : choice === "AWAY"
                     ? match.away_team_crest
                     : null;
+              const isConfirmed = isSaved && pendingChoice === choice;
+              const isPendingOnly = !isSaved && pendingChoice === choice;
               return (
                 <button
                   key={choice}
-                  onClick={() => onPredict(match.id, choice)}
-                  className={`py-2 rounded text-sm font-medium flex items-center justify-center gap-1.5 ${
-                    prediction?.prediction === choice && !wasExactScore
-                      ? "bg-purple-600 text-white"
-                      : "bg-slate-700 hover:bg-slate-600 text-slate-200"
+                  onClick={() => pickTeam(choice)}
+                  className={`py-2 rounded text-sm font-medium flex items-center justify-center gap-1.5 border ${
+                    isConfirmed
+                      ? "bg-green-600 border-green-500 text-white"
+                      : isPendingOnly
+                        ? "bg-slate-700 border-purple-500 text-slate-100"
+                        : "bg-slate-700 border-transparent hover:bg-slate-600 text-slate-200"
                   }`}
                 >
                   {crest && <img src={crest} alt="" className="w-4 h-4 object-contain" />}
@@ -106,12 +139,13 @@ function MatchCard({
                         ? match.away_team
                         : "Draw"}
                   </span>
+                  {isConfirmed && <span>&#10003;</span>}
                 </button>
               );
             })}
           </div>
           <div className="flex items-center gap-2 text-sm">
-            <span className="text-slate-500">Exact score (bonus +5):</span>
+            <span className="text-slate-500">Score:</span>
             <input
               type="number"
               min="0"
@@ -128,18 +162,15 @@ function MatchCard({
               className="w-14 px-2 py-1 rounded bg-slate-700 text-white text-center"
             />
             <button
-              onClick={() => {
-                const home = Number(homeInput);
-                const away = Number(awayInput);
-                if (homeInput !== "" && awayInput !== "" && home >= 0 && away >= 0) {
-                  onPredictExact(match.id, home, away);
-                }
-              }}
-              disabled={homeInput === "" || awayInput === ""}
+              onClick={handleSave}
+              disabled={homeInput === "" || awayInput === "" || isSaved}
               className="px-3 py-1 rounded bg-purple-600 hover:bg-purple-500 text-white disabled:opacity-40"
             >
-              Save
+              {isSaved ? "Saved" : "Save"}
             </button>
+            <span className="text-slate-500 text-xs">
+              exact score = +5, correct side only = +3
+            </span>
           </div>
         </div>
       ) : (
@@ -149,9 +180,7 @@ function MatchCard({
               <span className="text-slate-400">
                 Your prediction:{" "}
                 <span className="text-slate-200">
-                  {wasExactScore
-                    ? `${prediction.home_score_prediction}-${prediction.away_score_prediction}`
-                    : prediction.prediction}
+                  {prediction.home_score_prediction}-{prediction.away_score_prediction}
                 </span>
               </span>
               {isFinished && (
@@ -222,17 +251,8 @@ export default function Matches() {
     if (gameweek !== null) load(gameweek);
   }, [gameweek]);
 
-  async function handlePredict(matchId: number, choice: PredictionChoice) {
-    try {
-      const updated = await api.submitPrediction(matchId, choice);
-      setPredictions((prev) => [updated, ...prev.filter((p) => p.match_id !== matchId)]);
-    } catch (err) {
-      setError(err instanceof ApiError ? err.message : "Failed to submit prediction");
-    }
-  }
-
-  async function handlePredictExact(matchId: number, home: number, away: number) {
-    const choice: PredictionChoice = home > away ? "HOME" : home < away ? "AWAY" : "DRAW";
+  async function handleSave(matchId: number, home: number, away: number) {
+    const choice = outcomeFor(home, away);
     try {
       const updated = await api.submitPrediction(matchId, choice, home, away);
       setPredictions((prev) => [updated, ...prev.filter((p) => p.match_id !== matchId)]);
@@ -298,8 +318,7 @@ export default function Matches() {
               key={match.id}
               match={match}
               prediction={predictionByMatch.get(match.id)}
-              onPredict={handlePredict}
-              onPredictExact={handlePredictExact}
+              onSave={handleSave}
               isCurrentGameweek={gameweek === currentGameweek}
               hasContributed={hasContributed !== false}
             />

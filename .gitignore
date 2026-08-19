@@ -13,3 +13,6 @@ dist/
 
 # Logs
 *.log
+
+# Database backups (contain real user data - never commit)
+backups/
