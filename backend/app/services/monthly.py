@@ -17,7 +17,10 @@ def get_monthly_result(db: Session, period: str) -> MonthlyResult:
     ).scalar()
     total = Decimal(total)
 
-    rows = _ranked_rows(db, period)[:3]
+    # Only rank people who've actually scored - being first in the query with
+    # 0 points (nobody's played yet) isn't a real win, just an artifact of sort
+    # order. No points on the board yet means no winners yet.
+    rows = [r for r in _ranked_rows(db, period) if r.total_points > 0][:3]
     winners = [
         MonthlyWinner(
             rank=i + 1,
