@@ -30,8 +30,9 @@ export default function Leaderboard() {
               <tr>
                 <th className="px-4 py-3">Rank</th>
                 <th className="px-4 py-3">Player</th>
-                <th className="px-4 py-3">Correct</th>
-                <th className="px-4 py-3">Total</th>
+                <th className="px-4 py-3 text-center">Total</th>
+                <th className="px-4 py-3 text-center">Correct</th>
+                <th className="px-4 py-3 text-center">Wrong</th>
                 <th className="px-4 py-3 text-right">Points</th>
               </tr>
             </thead>
@@ -45,8 +46,15 @@ export default function Leaderboard() {
                 >
                   <td className="px-4 py-3 text-slate-300">{entry.rank}</td>
                   <td className="px-4 py-3 text-white font-medium">{entry.username}</td>
-                  <td className="px-4 py-3 text-slate-400">{entry.correct_predictions}</td>
-                  <td className="px-4 py-3 text-slate-400">{entry.total_predictions}</td>
+                  <td className="px-4 py-3 text-slate-400 text-center">
+                    {entry.total_predictions}
+                  </td>
+                  <td className="px-4 py-3 text-green-400 text-center">
+                    {entry.correct_predictions}
+                  </td>
+                  <td className="px-4 py-3 text-red-400 text-center">
+                    {entry.total_predictions - entry.correct_predictions}
+                  </td>
                   <td className="px-4 py-3 text-right text-white font-semibold">
                     {entry.total_points}
                   </td>

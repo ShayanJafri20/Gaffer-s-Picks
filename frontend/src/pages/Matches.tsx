@@ -90,7 +90,12 @@ function MatchCard({
           {match.home_team_crest && (
             <img src={match.home_team_crest} alt="" className="w-6 h-6 object-contain shrink-0" />
           )}
-          <span className="truncate">{match.home_team}</span>
+          <div className="min-w-0">
+            <span className="truncate block">{match.home_team}</span>
+            <span className="text-slate-500 text-[10px] font-normal uppercase tracking-wide">
+              Home
+            </span>
+          </div>
         </div>
         {match.home_score !== null && match.away_score !== null ? (
           <span className="text-2xl px-3 shrink-0">
@@ -100,7 +105,12 @@ function MatchCard({
           <span className="text-slate-500 text-sm px-3 shrink-0">vs</span>
         )}
         <div className="flex items-center gap-2 flex-1 min-w-0 justify-end">
-          <span className="truncate">{match.away_team}</span>
+          <div className="min-w-0 text-right">
+            <span className="truncate block">{match.away_team}</span>
+            <span className="text-slate-500 text-[10px] font-normal uppercase tracking-wide">
+              Away
+            </span>
+          </div>
           {match.away_team_crest && (
             <img src={match.away_team_crest} alt="" className="w-6 h-6 object-contain shrink-0" />
           )}
