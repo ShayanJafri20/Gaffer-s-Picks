@@ -1,7 +1,13 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
-import { api, type MonthlyResult, type MyRank, type PrizePool } from "../lib/api";
+import {
+  api,
+  type MonthlyResult,
+  type MyMonthSummary,
+  type MyRank,
+  type PrizePool,
+} from "../lib/api";
 import Layout from "../components/Layout";
 
 function formatMonth(period: string) {
@@ -75,6 +81,63 @@ function NewMonthBanner({ pool }: { pool: PrizePool }) {
   );
 }
 
+function MyPrizeHistory() {
+  const [summaries, setSummaries] = useState<MyMonthSummary[] | null>(null);
+
+  useEffect(() => {
+    api.myMonthlySummaries().then(setSummaries).catch(() => setSummaries([]));
+  }, []);
+
+  if (!summaries || summaries.length === 0) return null;
+
+  const totalContributed = summaries.reduce((sum, s) => sum + Number(s.contributed), 0);
+  const totalWon = summaries.reduce((sum, s) => sum + Number(s.won), 0);
+  const net = totalWon - totalContributed;
+
+  return (
+    <div className="bg-slate-800 rounded-lg p-6">
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-white font-semibold">Your Prize History</h2>
+        <p className={`text-sm font-semibold ${net >= 0 ? "text-green-400" : "text-red-400"}`}>
+          Net: {net >= 0 ? "+" : ""}
+          Rs. {net.toLocaleString()}
+        </p>
+      </div>
+      <div className="grid grid-cols-2 gap-4 mb-4">
+        <div>
+          <p className="text-slate-400 text-xs">Total contributed</p>
+          <p className="text-lg font-semibold text-white">
+            Rs. {totalContributed.toLocaleString()}
+          </p>
+        </div>
+        <div>
+          <p className="text-slate-400 text-xs">Total won</p>
+          <p className="text-lg font-semibold text-white">Rs. {totalWon.toLocaleString()}</p>
+        </div>
+      </div>
+      <div className="space-y-1.5">
+        {summaries.map((s) => {
+          const won = Number(s.won);
+          return (
+            <div
+              key={s.period}
+              className="flex items-center justify-between text-sm border-t border-slate-700 pt-1.5 first:border-t-0 first:pt-0"
+            >
+              <span className="text-slate-400">{formatMonth(s.period)}</span>
+              <span className="text-slate-300">
+                Contributed Rs. {Number(s.contributed).toLocaleString()}
+              </span>
+              <span className={won > 0 ? "text-green-400 font-medium" : "text-slate-500"}>
+                {won > 0 ? `Won Rs. ${won.toLocaleString()}` : "Didn't place"}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 export default function Dashboard() {
   const { user } = useAuth();
   const [rank, setRank] = useState<MyRank | null>(null);
@@ -119,6 +182,8 @@ export default function Dashboard() {
             </p>
           </div>
         </div>
+
+        <MyPrizeHistory />
 
         <div className="flex flex-wrap gap-3">
           <Link
