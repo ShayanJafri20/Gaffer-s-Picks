@@ -1,7 +1,8 @@
 # Gaffer's Picks
 
 A private Premier League prediction game built for a small group of friends. Predict
-every gameweek's results, earn points, and compete for a monthly prize pool.
+every gameweek's results, earn points, and climb the leaderboard. No money, no
+gambling - just points and bragging rights.
 
 ---
 
@@ -15,12 +16,9 @@ every gameweek's results, earn points, and compete for a monthly prize pool.
   deducted.
 - **Gameweeks** — only the current gameweek is open for predictions. Once every match
   in it finishes, the next one unlocks automatically.
-- **Monthly cycles** — the leaderboard resets every calendar month. Everyone
-  contributes a fresh amount to that month's prize pool before they can predict.
-  When the month ends, the top 3 scorers split the pool 60/20/10. A "Champions" page
-  keeps a running history of every past month's winners.
-- **Money stays separate from points** — contributions are purely a record (no real
-  payments are processed); the leaderboard never depends on who paid what.
+- **Leaderboard & winner** — ranks everyone by total points across the whole season.
+  Whoever has the most points when the season ends wins. No prize pool, no
+  contributions, no money involved anywhere in the app.
 
 ## Features
 
@@ -29,9 +27,9 @@ every gameweek's results, earn points, and compete for a monthly prize pool.
   [football-data.org](https://www.football-data.org))
 - Automatic background sync every 5 minutes — scores, match status, and points all
   update without anyone lifting a finger
-- Team crests, kickoff times shown in Pakistan time
+- Team crests, kickoff times shown in Pakistan time, Home/Away labels on match cards
 - Admin panel: manage users, trigger manual syncs/recalculations, promote admins
-- Prediction history, monthly prize history, personal contributed-vs-won summary
+- Prediction history page - every pick you've made, grouped by gameweek
 
 ## Tech stack
 
@@ -51,7 +49,7 @@ backend/
     api/          route handlers (auth, matches, predictions, leaderboard, admin, ...)
     models/        SQLAlchemy models
     schemas/        Pydantic request/response schemas
-    services/       business logic (scoring, gameweeks, monthly prize calc, football API client)
+    services/       business logic (scoring, gameweeks, football API client)
     jobs/           background sync job + scheduler
     core/            config and security (JWT, password hashing)
   alembic/          database migrations
