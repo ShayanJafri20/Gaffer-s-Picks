@@ -7,7 +7,6 @@ from app.core.security import create_access_token, hash_password, verify_passwor
 from app.database.connection import get_db
 from app.models.user import User
 from app.schemas.user import Token, UserLogin, UserOut, UserRegister
-from app.services.period import current_period
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -52,16 +51,6 @@ def acknowledge_rules(
     db: Session = Depends(get_db), current_user: User = Depends(get_current_user)
 ):
     current_user.has_seen_rules = True
-    db.commit()
-    db.refresh(current_user)
-    return current_user
-
-
-@router.post("/acknowledge-month", response_model=UserOut)
-def acknowledge_month(
-    db: Session = Depends(get_db), current_user: User = Depends(get_current_user)
-):
-    current_user.last_seen_month = current_period()
     db.commit()
     db.refresh(current_user)
     return current_user

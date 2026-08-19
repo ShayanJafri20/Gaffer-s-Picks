@@ -38,25 +38,11 @@ export default function RulesContent() {
       </section>
 
       <section>
-        <h2 className="text-white font-semibold mb-2">Leaderboard & monthly winners</h2>
+        <h2 className="text-white font-semibold mb-2">Leaderboard & winner</h2>
         <p>
-          The leaderboard resets every month — it only ranks points earned within the
-          current calendar month. When the month ends, the top 3 scorers split that
-          month's prize pool: 60% to 1st, 20% to 2nd, 10% to 3rd. Then it all resets and
-          a new month starts.
-        </p>
-      </section>
-
-      <section>
-        <h2 className="text-white font-semibold mb-2">Prize pool</h2>
-        <p>
-          Add your contribution amount at the start of each month — this is required
-          before you can predict that month's matches. This is purely a record — the
-          app never processes real payments. Points and money are completely separate:
-          the leaderboard never depends on who contributed, and contributing never
-          affects your points. The actual prize money is settled between you and your
-          friends outside the app. You can check past months' winners on the
-          Champions page anytime.
+          The leaderboard ranks everyone by total points across the whole season.
+          Whoever has the most points when the season ends wins. That's it — no money,
+          no prize pool, just bragging rights.
         </p>
       </section>
     </div>

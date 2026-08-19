@@ -5,13 +5,11 @@ from sqlalchemy.orm import Session
 
 from app.api.deps import get_current_user
 from app.database.connection import get_db
-from app.models.contribution import Contribution
 from app.models.match import Match
 from app.models.prediction import Prediction
 from app.models.user import User
 from app.schemas.prediction import PredictionCreate, PredictionOut
 from app.services.gameweek import get_current_gameweek
-from app.services.period import current_period
 
 router = APIRouter(tags=["predictions"])
 
@@ -23,18 +21,6 @@ def submit_prediction(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    has_contributed_this_month = (
-        db.query(Contribution)
-        .filter(Contribution.user_id == current_user.id, Contribution.period == current_period())
-        .first()
-        is not None
-    )
-    if not has_contributed_this_month:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Add your contribution to this month's prize pool before predicting",
-        )
-
     match = db.get(Match, match_id)
     if match is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Match not found")

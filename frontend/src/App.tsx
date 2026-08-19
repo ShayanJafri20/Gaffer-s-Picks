@@ -5,8 +5,6 @@ import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import Matches from "./pages/Matches";
 import Leaderboard from "./pages/Leaderboard";
-import PrizePool from "./pages/PrizePool";
-import MonthlyHistory from "./pages/MonthlyHistory";
 import MyPredictions from "./pages/MyPredictions";
 import Rules from "./pages/Rules";
 import Standings from "./pages/Standings";
@@ -59,22 +57,6 @@ function App() {
         element={
           <ProtectedRoute>
             <Leaderboard />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/prize-pool"
-        element={
-          <ProtectedRoute>
-            <PrizePool />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/prize-history"
-        element={
-          <ProtectedRoute>
-            <MonthlyHistory />
           </ProtectedRoute>
         }
       />

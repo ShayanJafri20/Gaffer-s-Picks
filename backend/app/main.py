@@ -4,17 +4,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import (
-    admin,
-    auth,
-    contributions,
-    cron,
-    leaderboard,
-    matches,
-    monthly,
-    predictions,
-    standings,
-)
+from app.api import admin, auth, cron, leaderboard, matches, predictions, standings
 from app.core.config import settings
 from app.jobs.scheduler import start_scheduler, stop_scheduler
 
@@ -47,8 +37,6 @@ app.include_router(auth.router)
 app.include_router(matches.router)
 app.include_router(predictions.router)
 app.include_router(leaderboard.router)
-app.include_router(contributions.router)
-app.include_router(monthly.router)
 app.include_router(standings.router)
 app.include_router(admin.router)
 app.include_router(cron.router)

@@ -7,6 +7,7 @@ class LeaderboardEntry(BaseModel):
     username: str
     total_points: int
     correct_predictions: int
+    wrong_predictions: int
     total_predictions: int
 
 
@@ -14,4 +15,5 @@ class MyRank(BaseModel):
     rank: int
     total_points: int
     correct_predictions: int
+    wrong_predictions: int
     total_predictions: int

@@ -8,7 +8,7 @@ const linkClass = ({ isActive }: { isActive: boolean }) =>
     isActive ? "bg-purple-600 text-white" : "text-slate-300 hover:bg-slate-800"
   }`;
 
-const MORE_PATHS = ["/table", "/prize-history", "/my-predictions", "/rules", "/admin"];
+const MORE_PATHS = ["/table", "/my-predictions", "/rules", "/admin"];
 
 function MoreMenu() {
   const { user } = useAuth();
@@ -36,13 +36,6 @@ function MoreMenu() {
               className="block px-4 py-2 text-sm text-slate-200 hover:bg-slate-700"
             >
               Table
-            </NavLink>
-            <NavLink
-              to="/prize-history"
-              onClick={() => setOpen(false)}
-              className="block px-4 py-2 text-sm text-slate-200 hover:bg-slate-700"
-            >
-              Champions
             </NavLink>
             <NavLink
               to="/my-predictions"
@@ -95,9 +88,6 @@ export default function Nav() {
           </NavLink>
           <NavLink to="/leaderboard" className={linkClass}>
             Leaderboard
-          </NavLink>
-          <NavLink to="/prize-pool" className={linkClass}>
-            Prize Pool
           </NavLink>
           <MoreMenu />
         </div>

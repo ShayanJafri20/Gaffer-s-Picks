@@ -53,7 +53,7 @@ export default function Leaderboard() {
                     {entry.correct_predictions}
                   </td>
                   <td className="px-4 py-3 text-red-400 text-center">
-                    {entry.total_predictions - entry.correct_predictions}
+                    {entry.wrong_predictions}
                   </td>
                   <td className="px-4 py-3 text-right text-white font-semibold">
                     {entry.total_points}

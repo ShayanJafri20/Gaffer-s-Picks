@@ -84,6 +84,7 @@ export interface LeaderboardEntry {
   username: string;
   total_points: number;
   correct_predictions: number;
+  wrong_predictions: number;
   total_predictions: number;
 }
 
@@ -91,44 +92,8 @@ export interface MyRank {
   rank: number;
   total_points: number;
   correct_predictions: number;
+  wrong_predictions: number;
   total_predictions: number;
-}
-
-export interface Contribution {
-  id: number;
-  user_id: number;
-  username: string;
-  amount: string;
-  period: string;
-  created_at: string;
-}
-
-export interface PrizePool {
-  period: string;
-  total: string;
-  contributions: Contribution[];
-  has_contributed: boolean;
-}
-
-export interface MonthlyWinner {
-  rank: number;
-  user_id: number;
-  username: string;
-  points: number;
-  payout: string;
-}
-
-export interface MonthlyResult {
-  period: string;
-  is_current: boolean;
-  total_pool: string;
-  winners: MonthlyWinner[];
-}
-
-export interface MyMonthSummary {
-  period: string;
-  contributed: string;
-  won: string;
 }
 
 export interface StandingsRow {
@@ -162,8 +127,6 @@ export const api = {
 
   acknowledgeRules: () => request<User>("/auth/acknowledge-rules", { method: "POST" }),
 
-  acknowledgeMonth: () => request<User>("/auth/acknowledge-month", { method: "POST" }),
-
   matches: (gameweek?: number) =>
     request<Match[]>(gameweek ? `/matches?gameweek=${gameweek}` : "/matches"),
 
@@ -189,14 +152,6 @@ export const api = {
   leaderboard: () => request<LeaderboardEntry[]>("/leaderboard"),
 
   myRank: () => request<MyRank>("/leaderboard/me"),
-
-  prizePool: () => request<PrizePool>("/contributions"),
-
-  addContribution: (amount: number) =>
-    request<Contribution>("/contributions", {
-      method: "POST",
-      body: JSON.stringify({ amount }),
-    }),
 
   adminListUsers: () => request<User[]>("/admin/users"),
 
@@ -224,10 +179,4 @@ export const api = {
     request<void>(`/admin/users/${userId}`, { method: "DELETE" }),
 
   standings: () => request<StandingsRow[]>("/standings"),
-
-  currentMonth: () => request<MonthlyResult>("/monthly/current"),
-
-  monthlyHistory: () => request<MonthlyResult[]>("/monthly/history"),
-
-  myMonthlySummaries: () => request<MyMonthSummary[]>("/monthly/me"),
 };
