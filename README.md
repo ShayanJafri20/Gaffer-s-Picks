@@ -1,10 +1,9 @@
 # Gaffer's Picks
 
 A private Premier League prediction game built for a small group of friends. Predict
-every gameweek's results, earn points, and climb the leaderboard. No money, no
-gambling - just points and bragging rights.
+every gameweek's results, earn points, and climb the leaderboard. 
 
----
+Live app:** https://gaffers-picks.vercel.app
 
 ## How it works
 
@@ -17,8 +16,7 @@ gambling - just points and bragging rights.
 - **Gameweeks** — only the current gameweek is open for predictions. Once every match
   in it finishes, the next one unlocks automatically.
 - **Leaderboard & winner** — ranks everyone by total points across the whole season.
-  Whoever has the most points when the season ends wins. No prize pool, no
-  contributions, no money involved anywhere in the app.
+  Whoever has the most points when the season ends wins. 
 
 ## Features
 
