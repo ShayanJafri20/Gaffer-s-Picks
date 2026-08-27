@@ -44,3 +44,12 @@ class AdminUserUpdate(BaseModel):
     email: EmailStr | None = None
     is_admin: bool | None = None
     hide_from_leaderboard: bool | None = None
+
+
+class ForgotPasswordRequest(BaseModel):
+    email: EmailStr
+
+
+class ResetPasswordRequest(BaseModel):
+    token: str
+    new_password: str = Field(min_length=8, max_length=100)

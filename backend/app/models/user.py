@@ -17,6 +17,10 @@ class User(Base):
     has_seen_rules: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     hide_from_leaderboard: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     last_seen_month: Mapped[str | None] = mapped_column(String(7), nullable=True)
+    reset_token_hash: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    reset_token_expires_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
     )

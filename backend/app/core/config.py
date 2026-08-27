@@ -9,6 +9,8 @@ class Settings(BaseSettings):
     football_api_key: str = ""
     frontend_url: str = "http://localhost:5173"
     cron_secret: str = ""
+    gmail_address: str = ""
+    gmail_app_password: str = ""
 
 
 settings = Settings()
